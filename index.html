@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>PRIYO.EXE — Portfolio OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress"></div>
+
+<!-- Cursor -->
+<canvas id="cur-trail-canvas"></canvas>
+<div id="cur"><div id="cur-dot"></div><div id="cur-ring"></div></div>
+
+<!-- Scanlines -->
+<div id="scanlines"></div>
+
+<!-- Particle canvas -->
+<canvas id="fx-canvas"></canvas>
+
+<!-- NIM badge -->
+<div class="nim-badge">NIM: 3022310501</div>
+
+<!-- Page Transition Overlay -->
+<div id="page-transition">
+  <div class="pt-panel"></div>
+  <div class="pt-panel"></div>
+  <div class="pt-panel"></div>
+  <span class="pt-label" id="pt-label">Loading...</span>
+</div>
+
+<!-- Audio Control Widget -->
+<div id="audio-ctrl">
+  <button class="ac-btn" id="ac-play" title="Play/Pause Music">
+    <i class="fa-solid fa-music" id="ac-play-icon"></i>
+  </button>
+  <div class="ac-vol-wrap">
+    <span class="ac-vol-label">VOL</span>
+    <div class="ac-vol-track" id="ac-vol-track" title="Volume">
+      <div class="ac-vol-fill" id="ac-vol-fill" style="height:35%"></div>
+      <div class="ac-vol-thumb" id="ac-vol-thumb" style="bottom:calc(35% - 6px)"></div>
+    </div>
+  </div>
+  <div class="ac-bars" id="ac-bars">
+    <div class="ac-bar-line"></div>
+    <div class="ac-bar-line"></div>
+    <div class="ac-bar-line"></div>
+    <div class="ac-bar-line"></div>
+  </div>
+</div>
+
+<!-- Sound wave -->
+<div id="soundwave">
+  <span style="--h:8px;animation-delay:0s"></span>
+  <span style="--h:20px;animation-delay:.1s"></span>
+  <span style="--h:14px;animation-delay:.2s"></span>
+  <span style="--h:22px;animation-delay:.15s"></span>
+  <span style="--h:10px;animation-delay:.3s"></span>
+  <span style="--h:18px;animation-delay:.05s"></span>
+  <span style="--h:6px;animation-delay:.25s"></span>
+</div>
+
+<!-- Konami Easter Egg -->
+<div id="konami-overlay">
+  <div class="konami-rain" id="konami-rain"></div>
+  <h2>🎮 CHEAT CODE UNLOCKED!</h2>
+  <p>Selamat! Kamu menemukan Easter Egg tersembunyi.<br>Priyo Rolandi Manuel — Info Systems Student &amp; Multimedia Producer</p>
+  <p style="color:var(--c1);margin-top:8px;font-size:.8rem">↑↑↓↓←→←→BA — Konami Code</p>
+  <button id="konami-close">[ CLOSE ]</button>
+</div>
+
+<!-- Background Music -->
+<audio id="bg-music" loop preload="auto">
+  <source src="memories.mp3" type="audio/mpeg"/>
+</audio>
+
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div id="boot-log"></div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  <button id="boot-skip">[ SKIP INTRO ]</button>
+</div>
+
+<!-- Mobile nav -->
+<nav id="mob-nav" aria-label="Mobile">
+  <a href="#about" class="mnl">about()</a>
+  <a href="#skills" class="mnl">skills()</a>
+  <a href="#timeline" class="mnl">experience()</a>
+  <a href="#portfolio" class="mnl">portfolio()</a>
+  <a href="#contact" class="mnl">contact()</a>
+</nav>
+
+<!-- HEADER -->
+<header id="hdr">
+  <span class="logo-text">PRIYO.EXE</span>
+  <nav class="desk">
+    <a href="#about">about()</a>
+    <a href="#skills">skills()</a>
+    <a href="#timeline">exp()</a>
+    <a href="#portfolio">work()</a>
+    <a href="#contact">contact()</a>
+  </nav>
+  <div class="nav-end">
+    <button class="icon-btn" id="theme-btn" title="Toggle theme"><i class="fa-solid fa-moon" id="th-icon"></i></button>
+    <button id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<!-- ===== HERO ===== -->
+<section id="hero" aria-label="Hero">
+  <div class="hero-glitch-bg">
+    <img class="op-hero-img" src="one-piece-poster-5120x2880-16685.jpg" alt="One Piece — Go To New World" fetchpriority="high"/>
+    <div class="op-hero-gradient"></div>
+    <div class="hex-grid"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-bottom-fade"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-system-tag">SYSTEM.ONLINE — PRIYO_OS v2.5.1 — INITIALIZING PORTFOLIO</div>
+    <h1 class="gname">
+      <span class="line1">PRIYO</span>
+      <span class="line2 glitch" data-text="ROLANDI">ROLANDI</span>
+      <span class="line3">Manuel</span>
+    </h1>
+    <div class="hero-subrow">
+      <span class="hero-tag active">Sistem Informasi</span>
+      <span class="hero-tag">UISI Gresik</span>
+      <span class="hero-tag">NIM: 3022310501</span>
+      <span class="hero-tag">Available</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn-neon" id="cta-main">
+        <span><i class="fa-solid fa-terminal"></i>&nbsp; CONNECT.EXE</span>
+      </a>
+      <a href="#portfolio" class="btn-solid">
+        <i class="fa-solid fa-folder-open"></i>&nbsp; VIEW WORK
+      </a>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item"><span class="dot"></span>Sistem Informasi</span>
+    <span class="ticker-item"><span class="dot"></span>Multimedia Production</span>
+    <span class="ticker-item"><span class="dot"></span>OBS Studio</span>
+    <span class="ticker-item"><span class="dot"></span>VMix Operator</span>
+    <span class="ticker-item"><span class="dot"></span>Power BI</span>
+    <span class="ticker-item"><span class="dot"></span>AutoCAD</span>
+    <span class="ticker-item"><span class="dot"></span>SketchUp</span>
+    <span class="ticker-item"><span class="dot"></span>Canva</span>
+    <span class="ticker-item"><span class="dot"></span>EasyWorship</span>
+    <span class="ticker-item"><span class="dot"></span>Visual Studio Code</span>
+    <span class="ticker-item"><span class="dot"></span>Event Coordinator</span>
+    <span class="ticker-item"><span class="dot"></span>Sistem Informasi</span>
+    <span class="ticker-item"><span class="dot"></span>Multimedia Production</span>
+    <span class="ticker-item"><span class="dot"></span>OBS Studio</span>
+    <span class="ticker-item"><span class="dot"></span>VMix Operator</span>
+    <span class="ticker-item"><span class="dot"></span>Power BI</span>
+    <span class="ticker-item"><span class="dot"></span>AutoCAD</span>
+    <span class="ticker-item"><span class="dot"></span>SketchUp</span>
+    <span class="ticker-item"><span class="dot"></span>Canva</span>
+    <span class="ticker-item"><span class="dot"></span>EasyWorship</span>
+    <span class="ticker-item"><span class="dot"></span>Visual Studio Code</span>
+    <span class="ticker-item"><span class="dot"></span>Event Coordinator</span>
+  </div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <div class="sec-label rv">About</div>
+  <div class="about-layout">
+    <div class="rv d1">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <div class="tb r"></div><div class="tb y"></div><div class="tb g"></div>
+          <span class="terminal-title">priyo@portfolio:~$</span>
+        </div>
+        <div class="terminal-body" id="term-body">
+          <span class="t-prompt">priyo@portfolio<span style="color:#fff">:</span>~<span style="color:#fff">$</span> </span><span class="t-cmd" id="term-cmd"></span><span class="t-cursor" id="term-cur"></span>
+        </div>
+      </div>
+    </div>
+    <div class="rv d2">
+      <h2 class="sec-title">Tentang<br><span style="color:var(--c1)">Saya</span></h2>
+      <p class="about-bio">
+        Mahasiswa aktif <strong>S1 Sistem Informasi</strong> di Universitas Internasional Semen Indonesia, Gresik.
+        Dengan passion di teknologi informasi dan multimedia — saya membangun sistem, menciptakan konten,
+        dan mengkoordinasi event berskala besar.
+      </p>
+      <p class="about-bio">
+        Saat ini menjabat sebagai <strong>Koordinator Tim Multimedia</strong> di dua organisasi berbeda,
+        membawa pengalaman produksi live streaming, desain grafis, dan manajemen tim secara bersamaan.
+      </p>
+      <div class="stat-pills">
+        <div class="stat-pill"><span class="sp-num counter" data-t="3">0</span><span class="sp-label">Years Exp</span></div>
+        <div class="stat-pill"><span class="sp-num counter" data-t="6">0</span><span class="sp-label">Projects</span></div>
+        <div class="stat-pill"><span class="sp-num counter" data-t="2">0</span><span class="sp-label">Medals</span></div>
+        <div class="stat-pill"><span class="sp-num counter" data-t="10">0</span><span class="sp-label">Skills+</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SKILLS ===== -->
+<section id="skills">
+  <div class="sec-label rv">Skills</div>
+  <h2 class="sec-title rv">Keahlian &amp;<br><span style="color:var(--c1)">Teknologi</span></h2>
+  <div class="skills-grid">
+    <div class="skill-card rv">
+      <div class="sk-head"><div class="sk-icon" style="color:var(--c5)">🖥️</div><div><div class="sk-name">Produktivitas</div><div class="sk-cat">Office & Analytics</div></div></div>
+      <div class="bar-list">
+        <div class="bar-item"><div class="bar-top"><span>Microsoft Office</span><span>90%</span></div><div class="bar-track"><div class="bar-fill" data-w="90"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>Google Workspace</span><span>85%</span></div><div class="bar-track"><div class="bar-fill" data-w="85"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>Power BI</span><span>70%</span></div><div class="bar-track"><div class="bar-fill" data-w="70"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-card rv d1">
+      <div class="sk-head"><div class="sk-icon" style="color:var(--c3)">🎬</div><div><div class="sk-name">Multimedia</div><div class="sk-cat">Production & Broadcast</div></div></div>
+      <div class="bar-list">
+        <div class="bar-item"><div class="bar-top"><span>OBS / VMix</span><span>88%</span></div><div class="bar-track"><div class="bar-fill" data-w="88"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>Canva</span><span>90%</span></div><div class="bar-track"><div class="bar-fill" data-w="90"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>CapCut</span><span>80%</span></div><div class="bar-track"><div class="bar-fill" data-w="80"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>EasyWorship</span><span>85%</span></div><div class="bar-track"><div class="bar-fill" data-w="85"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-card rv d2">
+      <div class="sk-head"><div class="sk-icon" style="color:var(--c4)">✏️</div><div><div class="sk-name">Desain & Dev</div><div class="sk-cat">CAD & Code</div></div></div>
+      <div class="bar-list">
+        <div class="bar-item"><div class="bar-top"><span>VS Code</span><span>80%</span></div><div class="bar-track"><div class="bar-fill" data-w="80"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>AutoCAD</span><span>65%</span></div><div class="bar-track"><div class="bar-fill" data-w="65"></div></div></div>
+        <div class="bar-item"><div class="bar-top"><span>SketchUp</span><span>60%</span></div><div class="bar-track"><div class="bar-fill" data-w="60"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-card rv d3">
+      <div class="sk-head"><div class="sk-icon" style="color:var(--c1)">🧠</div><div><div class="sk-name">Soft Skills</div><div class="sk-cat">Leadership & Teamwork</div></div></div>
+      <div class="tag-cloud">
+        <span class="stag">Team Leadership</span><span class="stag">Event Coord</span>
+        <span class="stag">Problem Solving</span><span class="stag">Komunikasi</span>
+        <span class="stag">Adaptif</span><span class="stag">Detail-Oriented</span>
+        <span class="stag">Manajemen Waktu</span><span class="stag">B. Indonesia</span>
+        <span class="stag">B. Inggris (Pasif)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TIMELINE ===== -->
+<section id="timeline">
+  <div class="sec-label rv">Journey</div>
+  <h2 class="sec-title rv">Pendidikan &amp;<br><span style="color:var(--c1)">Pengalaman</span></h2>
+  <div class="tl-tabs rv">
+    <button class="tl-tab on" data-tab="exp">Pengalaman</button>
+    <button class="tl-tab" data-tab="edu">Pendidikan</button>
+  </div>
+  <div class="tl-panel on" id="tp-exp">
+    <div class="tl-list">
+      <article class="tl-item rv"><div class="tl-dot"></div><div class="tl-date">2024 — Sekarang</div><div class="tl-role">Koordinator Tim Multimedia</div><div class="tl-org">Gereja Kristen Jawi Wetan Jemaat Gresik</div></article>
+      <article class="tl-item rv d1"><div class="tl-dot"></div><div class="tl-date">2025</div><div class="tl-role">Koordinator Tim Multimedia</div><div class="tl-org">Nextgen Corporate League Surabaya</div></article>
+      <article class="tl-item rv d2"><div class="tl-dot"></div><div class="tl-date">2024</div><div class="tl-role">Koordinator Divisi Logistik &amp; Transportasi</div><div class="tl-org">PKKMB UISI</div></article>
+      <article class="tl-item rv d3"><div class="tl-dot"></div><div class="tl-date">2023 — 2024</div><div class="tl-role">Karyawan Gereja Bidang Multimedia</div><div class="tl-org">Gereja Kristen Jawi Wetan Jemaat Gresik</div></article>
+      <article class="tl-item rv d4"><div class="tl-dot"></div><div class="tl-date">2023</div><div class="tl-role">Anggota Divisi Logistik &amp; Transportasi</div><div class="tl-org">PKKMB UISI</div></article>
+      <article class="tl-item rv d5"><div class="tl-dot"></div><div class="tl-date">2022 — Sekarang</div><div class="tl-role">Anggota Tim Multimedia</div><div class="tl-org">Gereja Kristen Jawi Wetan Jemaat Gresik</div></article>
+    </div>
+    <a href="https://www.youtube.com/@gkjwjemaatgresik/streams" target="_blank" rel="noopener" class="yt-strip rv">
+      <i class="fab fa-youtube"></i>
+      <div><strong>GKJW Jemaat Gresik — Live Stream Channel</strong><span>Lihat hasil produksi multimedia saya secara langsung</span></div>
+      <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--muted)"></i>
+    </a>
+  </div>
+  <div class="tl-panel" id="tp-edu">
+    <div class="tl-list">
+      <article class="tl-item rv"><div class="tl-dot"></div><div class="tl-date">2023 — Sekarang</div><div class="tl-role">S1 Sistem Informasi</div><div class="tl-org">Universitas Internasional Semen Indonesia (UISI)</div></article>
+      <article class="tl-item rv d1"><div class="tl-dot"></div><div class="tl-date">2019 — 2022</div><div class="tl-role">Jurusan MIPA</div><div class="tl-org">SMA Negeri 1 Manyar, Gresik</div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PORTFOLIO ===== -->
+<section id="portfolio">
+  <div class="sec-label rv">Work</div>
+  <h2 class="sec-title rv">Portofolio &amp;<br><span style="color:var(--c1)">Proyek</span></h2>
+  <div class="port-grid">
+    <article class="pcard tilt rv" data-href="https://www.youtube.com/@gkjwjemaatgresik/streams">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#0a0a20,#12002e)">📡</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">Live Production</span><h3 class="pcard-title">Live Streaming System</h3><p class="pcard-desc">Setup & operasional sistem live streaming ibadah menggunakan OBS, VMix, EasyWorship untuk GKJW Gresik.</p><span class="pcard-link">View Live <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+    <article class="pcard tilt rv d1" data-href="https://github.com/PriyoRolandiManuel">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#0d1117,#21262d)">💻</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">Web Dev</span><h3 class="pcard-title">Portfolio Website</h3><p class="pcard-desc">Website portofolio interaktif — HTML semantik, CSS modern, animasi game-like, dark mode responsif.</p><span class="pcard-link">GitHub <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+    <article class="pcard tilt rv d2" data-href="#">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#12002e,#2a0060)">📊</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">Data Analytics</span><h3 class="pcard-title">Dashboard Power BI</h3><p class="pcard-desc">Visualisasi data interaktif untuk laporan dan monitoring performa organisasi dengan Power BI.</p><span class="pcard-link">Detail <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+    <article class="pcard tilt rv d3" data-href="#">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#001a10,#003320)">🏗️</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">3D Design</span><h3 class="pcard-title">CAD & 3D Modeling</h3><p class="pcard-desc">Desain dan pemodelan 3D untuk keperluan akademik dan presentasi menggunakan AutoCAD & SketchUp.</p><span class="pcard-link">View Project <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+    <article class="pcard tilt rv d4" data-href="https://www.instagram.com/roland_immanuel/">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#2a1000,#4a2000)">🎬</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">Event Production</span><h3 class="pcard-title">Nextgen Corp League 2025</h3><p class="pcard-desc">Koordinasi penuh tim multimedia untuk event olahraga korporat tingkat regional Surabaya.</p><span class="pcard-link">Instagram <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+    <article class="pcard tilt rv d5" data-href="#">
+      <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#00102a,#00204a)">🎓</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
+      <div class="pcard-body"><span class="pcard-chip">Event Organizer</span><h3 class="pcard-title">PKKMB UISI 2024</h3><p class="pcard-desc">Koordinator Divisi Logistik & Transportasi untuk orientasi mahasiswa baru UISI 2024.</p><span class="pcard-link">Detail <i class="fa-solid fa-arrow-right"></i></span></div>
+    </article>
+  </div>
+</section>
+
+<!-- ===== ACHIEVEMENTS ===== -->
+<section id="achievements" style="background:var(--bg2)">
+  <div class="sec-label rv">Recognition</div>
+  <h2 class="sec-title rv">Prestasi &amp;<br><span style="color:var(--c1)">Penghargaan</span></h2>
+  <div class="ach-grid">
+    <div class="ach-card rv"><div class="ach-ico">🥈</div><div><div class="ach-h">Silver Medal — FESPA UBAYA 2024</div><p class="ach-p">Lomba Paduan Suara Festival Paduan Suara Antar Universitas, Universitas Surabaya.</p></div></div>
+    <div class="ach-card rv d1"><div class="ach-ico">🥈</div><div><div class="ach-h">Silver Medal — UINSA SCF 2025</div><p class="ach-p">UINSA Student Choir Festival — kompetisi paduan suara tingkat nasional.</p></div></div>
+    <div class="ach-card rv d2"><div class="ach-ico">🎯</div><div><div class="ach-h">Multi-Role Coordinator</div><p class="ach-p">Dipercaya memimpin tim multimedia di dua organisasi berbeda secara bersamaan sejak 2024.</p></div></div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="sec-label rv">Connect</div>
+  <h2 class="sec-title rv">Mari<br><span style="color:var(--c1)">Terhubung</span></h2>
+  <div class="contact-wrap">
+    <div class="rv">
+      <div class="contact-left">
+        <h3>Siap Berkolaborasi?</h3>
+        <p>Aktif mencari kesempatan magang di bidang IT & multimedia. Punya proyek menarik? Let's talk.</p>
+        <a href="mailto:prolandi77m@gmail.com" class="clink"><div class="clink-ico"><i class="fa-solid fa-envelope"></i></div><div><strong>Email</strong><span>prolandi77m@gmail.com</span></div></a>
+        <a href="https://wa.me/6281357787047" target="_blank" rel="noopener" class="clink"><div class="clink-ico" style="background:linear-gradient(135deg,#25d366,#128c7e)"><i class="fab fa-whatsapp"></i></div><div><strong>WhatsApp</strong><span>+62 813-5778-7047</span></div></a>
+        <a href="https://www.linkedin.com/in/priyo-rolandi-manuel-59a961256/" target="_blank" class="clink"><div class="clink-ico" style="background:linear-gradient(135deg,#0077b5,#00a0dc)"><i class="fab fa-linkedin-in"></i></div><div><strong>LinkedIn</strong><span>priyo-rolandi-manuel</span></div></a>
+        <div class="soc-row">
+          <a href="https://github.com/PriyoRolandiManuel" target="_blank" class="soc-btn" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="https://www.instagram.com/roland_immanuel/" target="_blank" class="soc-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/priyo-rolandi-manuel-59a961256/" target="_blank" class="soc-btn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.youtube.com/@gkjwjemaatgresik/streams" target="_blank" class="soc-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="mailto:prolandi77m@gmail.com" class="soc-btn" title="Email"><i class="fa-solid fa-envelope"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="rv d1">
+      <form class="cf" id="cf" novalidate>
+        <div><label class="fl" for="fn">Nama</label><input type="text" id="fn" class="fi" placeholder="John Doe"/><span class="ferr" id="en"></span></div>
+        <div><label class="fl" for="fe">Email</label><input type="email" id="fe" class="fi" placeholder="john@example.com"/><span class="ferr" id="ee"></span></div>
+        <div><label class="fl" for="fm">Pesan</label><textarea id="fm" class="ft" placeholder="Halo Priyo..."></textarea><span class="ferr" id="em"></span></div>
+        <button type="submit" class="btn-neon" style="width:100%;justify-content:center;cursor:pointer;border-radius:8px">
+          <span><i class="fa-solid fa-paper-plane"></i>&nbsp; SEND_MESSAGE.EXE</span>
+        </button>
+        <div id="fs" style="display:none;font-family:var(--mono);font-size:.75rem;color:var(--c1);text-align:center;padding:10px">[ MESSAGE SENT SUCCESSFULLY ]</div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p class="fc">&copy; 2025 <strong>PRIYO.EXE</strong> — Priyo Rolandi Manuel | 3022310501 | Sistem Informasi UISI</p>
+  <div class="fl-links">
+    <a href="#hero">home()</a><a href="#about">about()</a>
+    <a href="#skills">skills()</a><a href="#portfolio">work()</a><a href="#contact">contact()</a>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
