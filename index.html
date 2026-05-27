@@ -2,11 +2,17 @@
 <html lang="id" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)"/>
+<meta name="theme-color" content="#f8f7ff" media="(prefers-color-scheme: light)"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="format-detection" content="telephone=no"/>
 <title>PRIYO.EXE — Portfolio OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
@@ -21,6 +27,9 @@
 
 <!-- Scanlines -->
 <div id="scanlines"></div>
+
+<!-- Starfield canvas -->
+<canvas id="star-canvas"></canvas>
 
 <!-- Particle canvas -->
 <canvas id="fx-canvas"></canvas>
@@ -56,17 +65,6 @@
   </div>
 </div>
 
-<!-- Sound wave -->
-<div id="soundwave">
-  <span style="--h:8px;animation-delay:0s"></span>
-  <span style="--h:20px;animation-delay:.1s"></span>
-  <span style="--h:14px;animation-delay:.2s"></span>
-  <span style="--h:22px;animation-delay:.15s"></span>
-  <span style="--h:10px;animation-delay:.3s"></span>
-  <span style="--h:18px;animation-delay:.05s"></span>
-  <span style="--h:6px;animation-delay:.25s"></span>
-</div>
-
 <!-- Konami Easter Egg -->
 <div id="konami-overlay">
   <div class="konami-rain" id="konami-rain"></div>
@@ -77,7 +75,7 @@
 </div>
 
 <!-- Background Music -->
-<audio id="bg-music" loop preload="auto">
+<audio id="bg-music" loop preload="none" playsinline webkit-playsinline x-webkit-airplay="allow">
   <source src="memories.mp3" type="audio/mpeg"/>
 </audio>
 
@@ -269,7 +267,7 @@
   <div class="tl-panel on" id="tp-exp">
     <div class="tl-list">
       <article class="tl-item rv"><div class="tl-dot"></div><div class="tl-date">2024 — Sekarang</div><div class="tl-role">Koordinator Tim Multimedia</div><div class="tl-org">Gereja Kristen Jawi Wetan Jemaat Gresik</div></article>
-      <article class="tl-item rv d1"><div class="tl-dot"></div><div class="tl-date">2025</div><div class="tl-role">Koordinator Tim Multimedia</div><div class="tl-org">Nextgen Corporate League Surabaya</div></article>
+      <article class="tl-item rv d1"><div class="tl-dot"></div><div class="tl-date">2026</div><div class="tl-role">Koordinator Tim Multimedia</div><div class="tl-org">Nextgen Corporate League Surabaya</div></article>
       <article class="tl-item rv d2"><div class="tl-dot"></div><div class="tl-date">2024</div><div class="tl-role">Koordinator Divisi Logistik &amp; Transportasi</div><div class="tl-org">PKKMB UISI</div></article>
       <article class="tl-item rv d3"><div class="tl-dot"></div><div class="tl-date">2023 — 2024</div><div class="tl-role">Karyawan Gereja Bidang Multimedia</div><div class="tl-org">Gereja Kristen Jawi Wetan Jemaat Gresik</div></article>
       <article class="tl-item rv d4"><div class="tl-dot"></div><div class="tl-date">2023</div><div class="tl-role">Anggota Divisi Logistik &amp; Transportasi</div><div class="tl-org">PKKMB UISI</div></article>
@@ -312,7 +310,7 @@
     </article>
     <article class="pcard tilt rv d4" data-href="https://www.instagram.com/roland_immanuel/">
       <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#2a1000,#4a2000)">🎬</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
-      <div class="pcard-body"><span class="pcard-chip">Event Production</span><h3 class="pcard-title">Nextgen Corp League 2025</h3><p class="pcard-desc">Koordinasi penuh tim multimedia untuk event olahraga korporat tingkat regional Surabaya.</p><span class="pcard-link">Instagram <i class="fa-solid fa-arrow-right"></i></span></div>
+      <div class="pcard-body"><span class="pcard-chip">Event Production</span><h3 class="pcard-title">Nextgen Corp League 2026</h3><p class="pcard-desc">Koordinasi penuh tim multimedia untuk event olahraga korporat tingkat regional Surabaya.</p><span class="pcard-link">Instagram <i class="fa-solid fa-arrow-right"></i></span></div>
     </article>
     <article class="pcard tilt rv d5" data-href="#">
       <div class="pcard-thumb"><div class="pcard-visual" style="background:linear-gradient(135deg,#00102a,#00204a)">🎓</div><div class="pcard-shimmer"></div><div class="pcard-over"></div></div>
@@ -327,7 +325,7 @@
   <h2 class="sec-title rv">Prestasi &amp;<br><span style="color:var(--c1)">Penghargaan</span></h2>
   <div class="ach-grid">
     <div class="ach-card rv"><div class="ach-ico">🥈</div><div><div class="ach-h">Silver Medal — FESPA UBAYA 2024</div><p class="ach-p">Lomba Paduan Suara Festival Paduan Suara Antar Universitas, Universitas Surabaya.</p></div></div>
-    <div class="ach-card rv d1"><div class="ach-ico">🥈</div><div><div class="ach-h">Silver Medal — UINSA SCF 2025</div><p class="ach-p">UINSA Student Choir Festival — kompetisi paduan suara tingkat nasional.</p></div></div>
+    <div class="ach-card rv d1"><div class="ach-ico">🥈</div><div><div class="ach-h">Silver Medal — UINSA SCF 2026</div><p class="ach-p">UINSA Student Choir Festival — kompetisi paduan suara tingkat nasional.</p></div></div>
     <div class="ach-card rv d2"><div class="ach-ico">🎯</div><div><div class="ach-h">Multi-Role Coordinator</div><p class="ach-p">Dipercaya memimpin tim multimedia di dua organisasi berbeda secara bersamaan sejak 2024.</p></div></div>
   </div>
 </section>
@@ -370,7 +368,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <p class="fc">&copy; 2025 <strong>PRIYO.EXE</strong> — Priyo Rolandi Manuel | 3022310501 | Sistem Informasi UISI</p>
+  <p class="fc">&copy; 2026 <strong>PRIYO.EXE</strong> — Priyo Rolandi Manuel | 3022310501 | Sistem Informasi UISI</p>
   <div class="fl-links">
     <a href="#hero">home()</a><a href="#about">about()</a>
     <a href="#skills">skills()</a><a href="#portfolio">work()</a><a href="#contact">contact()</a>
