@@ -41,9 +41,20 @@ html.setAttribute('data-theme',saved);
 setThIcon(saved);
 document.getElementById('theme-btn').addEventListener('click',()=>{
   const n=html.getAttribute('data-theme')==='dark'?'light':'dark';
-  html.setAttribute('data-theme',n);
-  localStorage.setItem('prm-th',n);
-  setThIcon(n);
+  // Dim overlay — aktif di kedua arah pergantian theme
+  const dimEl=document.createElement('div');
+  dimEl.style.cssText='position:fixed;inset:0;z-index:99995;pointer-events:none;background:#000;opacity:0;transition:opacity .25s ease';
+  document.body.appendChild(dimEl);
+  requestAnimationFrame(()=>{
+    dimEl.style.opacity='0.55';
+    setTimeout(()=>{
+      html.setAttribute('data-theme',n);
+      localStorage.setItem('prm-th',n);
+      setThIcon(n);
+      dimEl.style.opacity='0';
+      setTimeout(()=>dimEl.remove(),300);
+    },250);
+  });
 });
 function setThIcon(t){document.getElementById('th-icon').className=t==='dark'?'fa-solid fa-sun':'fa-solid fa-moon'}
 
@@ -63,8 +74,16 @@ document.querySelectorAll('a,button,.pcard,.skill-card,.ach-card,.clink,.soc-btn
 /* CURSOR TRAIL */
 const trailCanvas=document.getElementById('cur-trail-canvas');
 const tctx=trailCanvas.getContext('2d');
-trailCanvas.width=window.innerWidth;trailCanvas.height=window.innerHeight;
-window.addEventListener('resize',()=>{trailCanvas.width=window.innerWidth;trailCanvas.height=window.innerHeight});
+function resizeTrailCanvas(){
+  const dpr=window.devicePixelRatio||1;
+  trailCanvas.width=window.innerWidth*dpr;
+  trailCanvas.height=window.innerHeight*dpr;
+  trailCanvas.style.width=window.innerWidth+'px';
+  trailCanvas.style.height=window.innerHeight+'px';
+  tctx.scale(dpr,dpr);
+}
+resizeTrailCanvas();
+window.addEventListener('resize',resizeTrailCanvas);
 const trailPoints=[];
 document.addEventListener('mousemove',e=>trailPoints.push({x:e.clientX,y:e.clientY,life:1}));
 (function trailLoop(){
@@ -80,32 +99,125 @@ document.addEventListener('mousemove',e=>trailPoints.push({x:e.clientX,y:e.clien
 })();
 
 /* =============================================
+   STARFIELD CANVAS
+   ============================================= */
+(function(){
+  const sc=document.getElementById('star-canvas');
+  const sctx=sc.getContext('2d');
+  let stars=[];
+  let starOpacity=1;
+  let starCurrentOpacity=1;
+
+  function resizeStar(){
+    const dpr=window.devicePixelRatio||1;
+    sc.width=window.innerWidth*dpr;
+    sc.height=window.innerHeight*dpr;
+    sc.style.width=window.innerWidth+'px';
+    sc.style.height=window.innerHeight+'px';
+    sctx.scale(dpr,dpr);
+  }
+  resizeStar();
+  window.addEventListener('resize',()=>{resizeStar();initStars();});
+
+  function initStars(){
+    stars=[];
+    const w=window.innerWidth,h=window.innerHeight;
+    const n=Math.min(160,Math.floor(w*h/8000));
+    for(let i=0;i<n;i++) stars.push({
+      x:Math.random()*w,
+      y:Math.random()*h,
+      r:Math.random()*1.2+0.2,
+      twinkle:Math.random()*Math.PI*2,
+      speed:Math.random()*0.02+0.005,
+    });
+  }
+  initStars();
+
+  function drawStars(){
+    const w=window.innerWidth,h=window.innerHeight;
+    sctx.clearRect(0,0,w,h);
+    if(starCurrentOpacity<=0.01){requestAnimationFrame(drawStars);return;}
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    stars.forEach(s=>{
+      s.twinkle+=s.speed;
+      const alpha=(0.35+0.45*Math.abs(Math.sin(s.twinkle)))*starCurrentOpacity;
+      sctx.beginPath();
+      sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      sctx.fillStyle=isDark?`rgba(255,255,255,${alpha})`:`rgba(107,47,255,${alpha*0.6})`;
+      sctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  // Smooth fade in/out
+  (function fadeLoop(){
+    const diff=starOpacity-starCurrentOpacity;
+    starCurrentOpacity+=diff*0.06;
+    sc.style.opacity='1'; // canvas always present, alpha handled in draw
+    requestAnimationFrame(fadeLoop);
+  })();
+
+  // Watch scroll: hide stars only when #about is visible
+  const aboutEl=document.getElementById('about');
+  function checkStarVisibility(){
+    if(!aboutEl)return;
+    const r=aboutEl.getBoundingClientRect();
+    const vh=window.innerHeight;
+    // #about dianggap "aktif" jika lebih dari 40% tingginya masuk viewport
+    const visible=r.top<vh*0.6&&r.bottom>vh*0.4;
+    starOpacity=visible?0:1;
+  }
+  window.addEventListener('scroll',checkStarVisibility,{passive:true});
+  checkStarVisibility();
+})();
+
+/* =============================================
    PARTICLE FIELD (FX CANVAS)
    ============================================= */
 const fc=document.getElementById('fx-canvas');
 const fctx=fc.getContext('2d');
-fc.width=window.innerWidth;fc.height=window.innerHeight;
-window.addEventListener('resize',()=>{fc.width=window.innerWidth;fc.height=window.innerHeight;initParticles()});
+function resizeFxCanvas(){
+  const dpr=window.devicePixelRatio||1;
+  fc.width=window.innerWidth*dpr;
+  fc.height=window.innerHeight*dpr;
+  fc.style.width=window.innerWidth+'px';
+  fc.style.height=window.innerHeight+'px';
+  fctx.scale(dpr,dpr);
+}
+resizeFxCanvas();
+window.addEventListener('resize',()=>{resizeFxCanvas();initParticles()});
 let particles=[];
+const PARTICLE_COLORS = [
+  [107, 47, 255],  // ungu vivid (light mode primary)
+  [0,  196, 122],  // hijau vibrant (light mode secondary)
+  [107, 47, 255],  // ungu (weight lebih banyak)
+  [107, 47, 255],
+  [0,  245, 160],  // neon green (dark mode)
+];
 function initParticles(){
   particles=[];
-  const n=Math.min(80,Math.floor(fc.width/16));
+  const w=window.innerWidth,h=window.innerHeight;
+  const n=Math.min(60,Math.floor(w/18));
   for(let i=0;i<n;i++) particles.push({
-    x:Math.random()*fc.width,y:Math.random()*fc.height,
+    x:Math.random()*w,y:Math.random()*h,
     vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
     r:Math.random()*1.5+.5,
-    opacity:Math.random()*.5+.1
+    opacity:Math.random()*.55+.18,
+    color:PARTICLE_COLORS[Math.floor(Math.random()*PARTICLE_COLORS.length)]
   });
 }
 initParticles();
 function drawParticles(){
-  fctx.clearRect(0,0,fc.width,fc.height);
+  const w=window.innerWidth,h=window.innerHeight;
+  fctx.clearRect(0,0,w,h);
   particles.forEach(p=>{
     p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0)p.x=fc.width;if(p.x>fc.width)p.x=0;
-    if(p.y<0)p.y=fc.height;if(p.y>fc.height)p.y=0;
+    if(p.x<0)p.x=w;if(p.x>w)p.x=0;
+    if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+    const [r,g,b]=p.color;
     fctx.beginPath();fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    fctx.fillStyle=`rgba(0,245,160,${p.opacity})`;fctx.fill();
+    fctx.fillStyle=`rgba(${r},${g},${b},${p.opacity})`;fctx.fill();
   });
   // draw connections
   for(let i=0;i<particles.length;i++){
@@ -116,7 +228,7 @@ function drawParticles(){
         fctx.beginPath();
         fctx.moveTo(particles[i].x,particles[i].y);
         fctx.lineTo(particles[j].x,particles[j].y);
-        fctx.strokeStyle=`rgba(0,245,160,${(1-dist/120)*.06})`;
+        fctx.strokeStyle=`rgba(0,245,160,${(1-dist/120)*.07})`;
         fctx.lineWidth=.5;fctx.stroke();
       }
     }
@@ -130,10 +242,28 @@ drawParticles();
    ============================================= */
 const hdr=document.getElementById('hdr');
 const prog=document.getElementById('progress');
+const nimBadge=document.querySelector('.nim-badge');
 window.addEventListener('scroll',()=>{
   hdr.classList.toggle('scrolled',scrollY>30);
   const pct=(scrollY/(document.body.scrollHeight-window.innerHeight))*100;
   prog.style.width=pct+'%';
+  /* NIM badge: fade out ketika mulai scroll melewati hero */
+  if(nimBadge){
+    const heroEl=document.getElementById('hero');
+    const heroBottom=heroEl?heroEl.offsetTop+heroEl.offsetHeight:window.innerHeight;
+    const fadeStart=heroBottom*0.55;
+    const fadeEnd=heroBottom*0.85;
+    if(scrollY<=fadeStart){
+      nimBadge.classList.remove('hidden');
+    } else if(scrollY>=fadeEnd){
+      nimBadge.classList.add('hidden');
+    } else {
+      /* zona transisi — fade smooth */
+      const ratio=(scrollY-fadeStart)/(fadeEnd-fadeStart);
+      nimBadge.style.opacity=1-ratio;
+      nimBadge.classList.remove('hidden');
+    }
+  }
 },{passive:true});
 
 /* =============================================
@@ -265,19 +395,24 @@ document.querySelectorAll('.tl-tab').forEach(btn=>{
 });
 
 /* =============================================
-   3D TILT on PORTFOLIO CARDS
+   3D TILT on PORTFOLIO CARDS — desktop only
    ============================================= */
-document.querySelectorAll('.pcard.tilt').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const r=card.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-.5;
-    const y=(e.clientY-r.top)/r.height-.5;
-    card.style.transform=`perspective(800px) rotateY(${x*12}deg) rotateX(${-y*8}deg) translateZ(10px)`;
+const isTouchDevice = window.matchMedia('(hover:none),(pointer:coarse)').matches;
+if(!isTouchDevice){
+  document.querySelectorAll('.pcard.tilt').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      card.style.transform=`perspective(800px) rotateY(${x*12}deg) rotateX(${-y*8}deg) translateZ(10px)`;
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform='perspective(800px) rotateY(0) rotateX(0) translateZ(0)'});
   });
-  card.addEventListener('mouseleave',()=>{card.style.transform='perspective(800px) rotateY(0) rotateX(0) translateZ(0)'});
+}
+document.querySelectorAll('.pcard.tilt').forEach(card=>{
   card.addEventListener('click',()=>{
     const href=card.dataset.href;
-    if(href&&href!=='#')window.open(href,'_blank');
+    if(href&&href!=='#')window.open(href,'_blank','noopener,noreferrer');
     const r=document.createElement('div');
     r.className='ripple-fx';
     r.style.cssText=`width:200px;height:200px;left:calc(50% - 100px);top:calc(50% - 100px)`;
@@ -286,28 +421,37 @@ document.querySelectorAll('.pcard.tilt').forEach(card=>{
 });
 
 /* =============================================
-   SKILL CARD GLOW FOLLOW
+   SKILL CARD GLOW FOLLOW — desktop only
    ============================================= */
-document.querySelectorAll('.skill-card').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const r=card.getBoundingClientRect();
-    card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
-    card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+if(!isTouchDevice){
+  document.querySelectorAll('.skill-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
   });
-});
+}
 
 /* =============================================
-   RIPPLE on BUTTONS
+   RIPPLE on BUTTONS — mouse + touch
    ============================================= */
 document.querySelectorAll('.btn-neon,.btn-solid').forEach(btn=>{
-  btn.addEventListener('click',e=>{
+  function doRipple(clientX,clientY){
     const r=document.createElement('div');
     r.className='ripple-fx';
     const rect=btn.getBoundingClientRect();
     const size=Math.max(rect.width,rect.height);
-    r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    r.style.cssText=`width:${size}px;height:${size}px;left:${clientX-rect.left-size/2}px;top:${clientY-rect.top-size/2}px`;
     btn.appendChild(r);r.addEventListener('animationend',()=>r.remove());
-  });
+  }
+  btn.addEventListener('click',e=>doRipple(e.clientX,e.clientY));
+  btn.addEventListener('touchend',e=>{
+    if(e.changedTouches&&e.changedTouches[0]){
+      const t=e.changedTouches[0];
+      doRipple(t.clientX,t.clientY);
+    }
+  },{passive:true});
 });
 
 /* =============================================
@@ -421,21 +565,29 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
   acPlay.addEventListener('click', () => setPlaying(!playing));
 
-  // Start after first interaction (browser policy)
+  // Start after first interaction (browser autoplay policy - all platforms)
   let started = false;
   function startMusic(){
     if(started) return;
     started = true;
+    // iOS Safari requires the audio context to be resumed after user gesture
+    if(audio.readyState === 0){
+      audio.load();
+    }
     setPlaying(true);
     document.removeEventListener('click', startMusic);
     document.removeEventListener('keydown', startMusic);
     document.removeEventListener('scroll', startMusic);
     document.removeEventListener('touchstart', startMusic);
+    document.removeEventListener('touchend', startMusic);
+    document.removeEventListener('pointerup', startMusic);
   }
   document.addEventListener('click', startMusic);
   document.addEventListener('keydown', startMusic);
   document.addEventListener('scroll', startMusic, {passive:true});
   document.addEventListener('touchstart', startMusic, {passive:true});
+  document.addEventListener('touchend', startMusic, {passive:true});
+  document.addEventListener('pointerup', startMusic, {passive:true});
 
   // Volume drag
   function updateVolFromEvent(e){
@@ -503,11 +655,15 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 /* =============================================
    PARALLAX — cursor moves particles, hero glitch
    ============================================= */
-document.addEventListener('mousemove',e=>{
-  const cx=(e.clientX/window.innerWidth-.5)*20;
-  const cy=(e.clientY/window.innerHeight-.5)*20;
-  document.querySelector('.hex-grid').style.transform=`translate(${cx*.3}px,${cy*.3}px)`;
-});
+if(!isTouchDevice){
+  document.addEventListener('mousemove',e=>{
+    const hexGrid=document.querySelector('.hex-grid');
+    if(!hexGrid)return;
+    const cx=(e.clientX/window.innerWidth-.5)*20;
+    const cy=(e.clientY/window.innerHeight-.5)*20;
+    hexGrid.style.transform=`translate(${cx*.3}px,${cy*.3}px)`;
+  });
+}
 
 /* =============================================
    KONAMI CODE EASTER EGG
@@ -532,22 +688,9 @@ function triggerKonami(){
     col.textContent=txt;
     rain.appendChild(col);
   }
-  document.getElementById('soundwave').classList.add('show');
-  setTimeout(()=>document.getElementById('soundwave').classList.remove('show'),5000);
 }
-document.getElementById('konami-close').addEventListener('click',()=>{
-  document.getElementById('konami-overlay').classList.remove('show');
-});
+document.getElementById('konami-close').addEventListener('click',()=>document.getElementById('konami-overlay').classList.remove('show'));
 
-/* =============================================
-   SOUND WAVE on scroll (visual only)
-   ============================================= */
-let swTimer;
-window.addEventListener('scroll',()=>{
-  document.getElementById('soundwave').classList.add('show');
-  clearTimeout(swTimer);
-  swTimer=setTimeout(()=>document.getElementById('soundwave').classList.remove('show'),1500);
-},{passive:true});
 
 
 /* =============================================
@@ -560,4 +703,52 @@ const imgObs=new IntersectionObserver(entries=>{
 document.querySelectorAll('.pcard-visual').forEach(el=>{
   el.style.opacity='0';el.style.transition='opacity .8s ease';
   imgObs.observe(el);
+});
+
+/* =============================================
+   LIGHT MODE: FORCE DARK THUMBNAIL BACKGROUNDS
+   Karena inline style di HTML override CSS,
+   kita override via JS saat theme berubah
+   ============================================= */
+const DARK_THUMBS = [
+  'linear-gradient(135deg,#0a0a20,#12002e)',  /* card 1 — deep violet */
+  'linear-gradient(135deg,#0d1117,#21262d)',  /* card 2 — dark slate */
+  'linear-gradient(135deg,#12002e,#2a0060)',  /* card 3 — deep purple */
+  'linear-gradient(135deg,#001a10,#003320)',  /* card 4 — deep green */
+  'linear-gradient(135deg,#2a1000,#4a2000)',  /* card 5 — deep amber */
+  'linear-gradient(135deg,#00102a,#00204a)',  /* card 6 — deep navy */
+];
+
+function applyThumbTheme(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  document.querySelectorAll('.pcard-visual').forEach((el, i) => {
+    if(isLight){
+      // Di light mode: pakai background gelap dramatis agar sama dengan dark mode
+      el.style.background = DARK_THUMBS[i] || DARK_THUMBS[0];
+    } else {
+      // Di dark mode: kembalikan ke inline style asli dari HTML
+      el.style.background = DARK_THUMBS[i] || '';
+    }
+  });
+}
+
+// Jalankan saat load
+applyThumbTheme();
+
+// Jalankan tiap kali theme berubah (pantau attribute)
+const themeObserver = new MutationObserver(() => applyThumbTheme());
+themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* =============================================
+   YT-STRIP — RED OUTLINE ON CLICK (BOTH THEMES)
+   ============================================= */
+document.querySelectorAll('.yt-strip').forEach(strip => {
+  function triggerFlash(){
+    strip.classList.remove('clicked');
+    void strip.offsetWidth; // force reflow agar animasi restart
+    strip.classList.add('clicked');
+    setTimeout(() => strip.classList.remove('clicked'), 600);
+  }
+  strip.addEventListener('click', triggerFlash);
+  strip.addEventListener('touchstart', triggerFlash, { passive: true });
 });
